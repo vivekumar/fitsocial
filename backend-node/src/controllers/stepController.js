@@ -55,3 +55,21 @@ exports.calculateCalories = (steps) => {
     const caloriesPerStep = 0.04; // Example value
     return steps * caloriesPerStep;
 };
+
+// Fetch step metrics for a specific date
+exports.getStepsByDate = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { date } = req.params;
+
+        const stepsData = await Step.findOne({ user_id: userId, date });
+
+        if (!stepsData) {
+            return res.status(404).json({ message: 'No step data found for the specified date.' });
+        }
+
+        res.status(200).json(stepsData);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};

@@ -11,6 +11,7 @@ const walletRoutes = require('./routes/walletRoutes');
 const competitionRoutes = require('./routes/competitionRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const adminAuthRoutes = require('./routes/adminAuthRoutes');
 const errorHandler = require('./middleware/errorHandler');
 
 dotenv.config();
@@ -33,6 +34,7 @@ app.use('/api/wallet', walletRoutes);
 app.use('/api/competitions', competitionRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/admin/auth', adminAuthRoutes);
 
 app.use(errorHandler);
 

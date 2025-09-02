@@ -20,7 +20,7 @@ exports.generateReferralCode = async (req, res) => {
 };
 
 // Validate a referral code during user registration
-exports.validateReferralCode = async (req, res, next) => {
+exports.validateReferralCode = async (req, res) => {
     const { referralCode } = req.body;
 
     try {
@@ -29,10 +29,27 @@ exports.validateReferralCode = async (req, res, next) => {
             return res.status(400).json({ success: false, message: 'Invalid referral code' });
         }
 
-        req.referrerId = referral.user; // Store referrer ID for later use
-        next();
+        res.status(200).json({ success: true, message: 'Valid referral code' });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Error validating referral code' });
+    }
+};
+
+// Get referral statistics for a user
+exports.getReferralStats = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        
+        const referralStats = await Referral.find({ user: userId }).populate('referred', 'email');
+        const totalReferrals = referralStats.length;
+        
+        res.status(200).json({
+            success: true,
+            totalReferrals,
+            referrals: referralStats
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Error fetching referral stats' });
     }
 };
 

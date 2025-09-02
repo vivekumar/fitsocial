@@ -11,6 +11,65 @@ exports.getAllUsers = async (req, res) => {
     }
 };
 
+// Function to get user by ID
+exports.getUserById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const user = await User.findById(id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching user', error });
+    }
+};
+
+// Function to update user details
+exports.updateUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updates = req.body;
+        const user = await User.findByIdAndUpdate(id, updates, { new: true, runValidators: true });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.status(200).json({ message: 'User updated successfully', user });
+    } catch (error) {
+        res.status(500).json({ message: 'Error updating user', error });
+    }
+};
+
+// Function to delete a user
+exports.deleteUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const user = await User.findByIdAndDelete(id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.status(200).json({ message: 'User deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error deleting user', error });
+    }
+};
+
+// Function to get activity stats
+exports.getActivityStats = async (req, res) => {
+    try {
+        // This is a placeholder - you can implement actual activity stats later
+        const stats = {
+            totalUsers: await User.countDocuments(),
+            activeUsers: await User.countDocuments({ lastActive: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } }),
+            totalSteps: 0, // Placeholder
+            totalRewards: 0 // Placeholder
+        };
+        res.status(200).json(stats);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching activity stats', error });
+    }
+};
+
 // Function to get user activity stats
 exports.getUserActivityStats = async (req, res) => {
     const { userId } = req.params;
@@ -29,11 +88,15 @@ exports.getUserActivityStats = async (req, res) => {
 
 // Function to adjust wallet balance
 exports.adjustWalletBalance = async (req, res) => {
-    const { userId, amount } = req.body;
     try {
-        const user = await User.findById(userId);
+        const { id } = req.params;
+        const { amount } = req.body;
+        const user = await User.findById(id);
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
+        }
+        if (!user.wallet) {
+            user.wallet = { balance: 0 };
         }
         user.wallet.balance += amount; // Adjust balance
         await user.save();

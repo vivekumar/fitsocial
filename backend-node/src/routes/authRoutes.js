@@ -3,7 +3,6 @@ const { register, login, resetPassword, socialLogin } = require('../controllers/
 const { validateRegistration, validateLogin } = require('../middleware/authMiddleware');
 
 const router = express.Router();
-console.log("jhgkjh",require('../middleware/authMiddleware'));
 
 router.post('/register', validateRegistration, register);
 router.post('/login', validateLogin, login);
